@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.Entity.Users;
 import com.example.demo.configuration.dto.LoginDto;
 import com.example.demo.repos.UserReposi;
-import com.example.demo.security.Secconfig;
 import com.example.demo.utility.JwtToken;
 
 @RestController

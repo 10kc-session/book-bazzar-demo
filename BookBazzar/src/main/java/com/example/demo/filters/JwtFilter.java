@@ -1,7 +1,6 @@
 package com.example.demo.filters;
 
 import java.io.IOException;
-import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,41 +19,41 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class JwtFilter extends OncePerRequestFilter{
-	
-	@Autowired
-	JwtToken jwt;
-	
-	@Autowired
-	CustomUserDetailService cds;
+public class JwtFilter extends OncePerRequestFilter {
+    
+    @Autowired
+    private JwtToken jwt;
+    
+    @Autowired
+    private CustomUserDetailService cds;
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		String token=null;
-		String userName = null;
-		
-		String authHead = request.getHeader("Authorization");
-		
-		if(authHead!=null && authHead.startsWith("Bearer ")) {
-			token = authHead.substring(7);
-			userName = jwt.extractUserName(token);
-		}
-		
-		if(userName!=null && SecurityContextHolder.getContext().getAuthentication()==null) {
-			
-			UserDetails usd = cds.loadUserByUsername(userName);
-			
-			if(jwt.validate(userName,usd,token)) {
-				UsernamePasswordAuthenticationToken upa = new UsernamePasswordAuthenticationToken(usd.getUsername(),usd.getPassword());
-				upa.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(upa);
-			}
-		}
-		System.out.println("Incoming request to: " + request.getRequestURI());
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        String token = null;
+        String userName = null;
 
-		filterChain.doFilter(request, response);
-		
-	}
+        String authHead = request.getHeader("Authorization");
 
+        if (authHead != null && authHead.startsWith("Bearer ")) {
+            token = authHead.substring(7);
+            userName = jwt.extractUserName(token);
+        }
+
+        if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails usd = cds.loadUserByUsername(userName);
+
+            if (jwt.validate(userName, usd, token)) {
+                UsernamePasswordAuthenticationToken upa = new UsernamePasswordAuthenticationToken(
+                    usd, 
+                    null, 
+                    usd.getAuthorities()
+                );
+                upa.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(upa);
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
 }

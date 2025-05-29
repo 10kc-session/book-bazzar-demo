@@ -4,7 +4,6 @@ import java.util.Date;
 
 import javax.crypto.SecretKey;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
